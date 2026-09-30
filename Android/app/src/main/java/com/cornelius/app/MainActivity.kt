@@ -133,8 +133,10 @@ class MainActivity : AppCompatActivity() {
     private fun setupSwipeRefresh() {
         swipeRefresh.setColorSchemeColors(0xFF38BDF8.toInt(), 0xFF22C55E.toInt())
         swipeRefresh.setProgressBackgroundColorSchemeColor(0xFF18181C.toInt())
-        // Disable swipe pull-to-refresh to prevent accidental page reloads while scrolling chat
-        swipeRefresh.isEnabled = false
+        swipeRefresh.isEnabled = true
+        swipeRefresh.setOnRefreshListener {
+            webView.reload()
+        }
     }
 
     private fun setupBackNavigation() {
@@ -151,8 +153,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadServerUrl() {
-        // Load fast local interface directly from APK assets to guarantee instant UI rendering
-        webView.loadUrl("file:///android_asset/mobile.html")
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val currentUrl = prefs.getString(KEY_SERVER_URL, DEFAULT_SERVER_URL) ?: DEFAULT_SERVER_URL
+        webView.loadUrl(currentUrl)
     }
 
     private fun showConnectionErrorDialog() {

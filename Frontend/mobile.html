@@ -526,14 +526,20 @@
             padding: 12px;
             gap: 10px;
             position: absolute;
-            inset: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             display: none;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
         #view-terminal.active {
-            display: flex;
+            display: flex !important;
         }
 
         .quick-commands {
@@ -792,6 +798,15 @@
                     <h3>Directs</h3>
                     <p>Abrir caixa de mensagens do Instagram.</p>
                     <button type="button" class="action-btn" onclick="sendControlAction('open_directs')">Abrir Directs</button>
+                </div>
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">🐙</span>
+                        <small id="ctrl-github-status" style="color:var(--accent-cyan); font-family:var(--font-mono); font-weight:bold;">GITHUB</small>
+                    </div>
+                    <h3>Atualizar GitHub</h3>
+                    <p>Envia todas as modificações do projeto para o GitHub com 1 clique.</p>
+                    <button type="button" class="action-btn primary" onclick="sendControlAction('sync_github')">🚀 Sincronizar Agora</button>
                 </div>
             </div>
         </div>

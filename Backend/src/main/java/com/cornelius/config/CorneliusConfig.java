@@ -35,6 +35,10 @@ public class CorneliusConfig {
     private String instagramSessionId = "";
     private boolean instagramEnabled = false;
 
+    // GitHub Integration
+    private String githubToken = "";
+    private String githubRepo = "GabriellCode/Cornelius-AI";
+
     public CorneliusConfig() {
         // Look for environment variables as defaults
         String envKey = System.getenv("GEMINI_API_KEY");
@@ -88,6 +92,8 @@ public class CorneliusConfig {
                 if (map.containsKey("instagramEnabled") && map.get("instagramEnabled") instanceof Boolean b) {
                     config.setInstagramEnabled(b);
                 }
+                if (map.containsKey("githubToken")) config.setGithubToken((String) map.get("githubToken"));
+                if (map.containsKey("githubRepo")) config.setGithubRepo((String) map.get("githubRepo"));
             }
             Logger.info("Config", "Configurações carregadas com sucesso de: " + CONFIG_FILE);
         } catch (Exception e) {
@@ -124,6 +130,8 @@ public class CorneliusConfig {
             map.put("instagramAccessToken", instagramAccessToken);
             map.put("instagramSessionId", instagramSessionId);
             map.put("instagramEnabled", instagramEnabled);
+            map.put("githubToken", githubToken);
+            map.put("githubRepo", githubRepo);
 
             String json = JsonParser.toPrettyJson(map);
             Files.writeString(Paths.get(CONFIG_FILE), json);
@@ -224,5 +232,9 @@ public class CorneliusConfig {
     public void setInstagramSessionId(String instagramSessionId) { this.instagramSessionId = instagramSessionId; }
 
     public int getServerPort() { return serverPort; }
+    public String getGithubToken() { return githubToken; }
+    public void setGithubToken(String githubToken) { this.githubToken = githubToken; }
+    public String getGithubRepo() { return githubRepo; }
+    public void setGithubRepo(String githubRepo) { this.githubRepo = githubRepo; }
 }
 

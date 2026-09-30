@@ -374,7 +374,7 @@ public class LocalApiServer {
                                 if (discordBotService != null) {
                                     discordBotService.start();
                                 } else if (SystemProfile.isWindows()) {
-                                    new ProcessBuilder("cmd.exe", "/c", "run-discord-bot.bat").start();
+                                    new ProcessBuilder("cmd.exe", "/c", "run-discord-bot.bat").directory(new File("E:\\APP")).start();
                                 } else {
                                     new ProcessBuilder("systemctl", "--user", "restart", "cornelius.service").start();
                                 }
@@ -382,6 +382,21 @@ public class LocalApiServer {
                         });
                         resp.put("success", true);
                         resp.put("message", "Reinício do Bot Discord disparado.");
+                    }
+                    case "sync_github" -> {
+                        Thread.ofVirtual().start(() -> {
+                            try {
+                                if (SystemProfile.isWindows()) {
+                                    new ProcessBuilder("cmd.exe", "/c", "sync-github.bat", "auto-sync via Cornelius mobile app").directory(new File("E:\\APP")).start();
+                                } else {
+                                    new ProcessBuilder("bash", "sync-github.sh").start();
+                                }
+                            } catch (Exception e) {
+                                Logger.error("Server", "Erro ao executar sincronização GitHub: " + e.getMessage());
+                            }
+                        });
+                        resp.put("success", true);
+                        resp.put("message", "Sincronização com GitHub iniciada! Seu código será atualizado no repositório.");
                     }
                     default -> resp.put("error", "Ação desconhecida: " + action);
                 }

@@ -35,6 +35,13 @@ if (-not $token) {
 }
 
 if (-not $token) {
+    $tokenFile = "$HOME\.cornelius\github.token"
+    if (Test-Path $tokenFile) {
+        $token = (Get-Content $tokenFile -Raw).Trim()
+    }
+}
+
+if (-not $token) {
     Log-Msg "[ERRO] Token do GitHub não configurado no arquivo $configFile nem na variável GITHUB_TOKEN."
     exit 1
 }
