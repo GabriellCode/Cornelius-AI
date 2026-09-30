@@ -1,5 +1,9 @@
 # 🎩 Cornelius - Mordomo Pessoal de Inteligência Artificial
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-21%2B-orange.svg)](https://openjdk.org/)
+[![Android](https://img.shields.io/badge/Android-Client-green.svg)](Android/)
+
 **Cornelius** é o seu mordomo pessoal de inteligência artificial de alto desempenho, desenvolvido com backend **100% Java 21 nativo** para o sistema **Linux Pop!_OS**.
 
 O aplicativo roda localmente no seu notebook como um aplicativo executável desktop, gerencia e comprime dados em um **HD externo de 1TB**, acessa a **internet em tempo real**, monitora a telemetria da sua máquina e alimenta continuamente sua base de conhecimento.
@@ -94,4 +98,11 @@ Para executar a validação de todos os módulos (JSON, Compressão, HD, RAG e T
 ```bash
 java -cp Backend/bin com.cornelius.test.CorneliusTestSuite
 ```
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob os termos da licença [MIT](LICENSE) © 2026 GabriellCode. Consulte o arquivo [LICENSE](LICENSE) para obter todos os detalhes.
+
 
