@@ -54,15 +54,36 @@ public class LocalApiServer {
             server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
 
             // Core API Endpoints
-            server.createContext("/api/chat", new ChatHandler());
-            server.createContext("/api/storage", new StorageHandler());
-            server.createContext("/api/system", new SystemHandler());
-            server.createContext("/api/status", new StatusHandler());
-            server.createContext("/api/terminal", new TerminalHandler());
-            server.createContext("/api/control", new ControlHandler());
-            server.createContext("/api/logs", new LogsHandler());
-            server.createContext("/api/memories", new MemoriesHandler());
-            server.createContext("/api/health", new HealthHandler());
+            ChatHandler chatHandler = new ChatHandler();
+            StorageHandler storageHandler = new StorageHandler();
+            SystemHandler systemHandler = new SystemHandler();
+            StatusHandler statusHandler = new StatusHandler();
+            TerminalHandler terminalHandler = new TerminalHandler();
+            ControlHandler controlHandler = new ControlHandler();
+            LogsHandler logsHandler = new LogsHandler();
+            MemoriesHandler memoriesHandler = new MemoriesHandler();
+            HealthHandler healthHandler = new HealthHandler();
+
+            server.createContext("/api/chat", chatHandler);
+            server.createContext("/api/storage", storageHandler);
+            server.createContext("/api/system", systemHandler);
+            server.createContext("/api/status", statusHandler);
+            server.createContext("/api/terminal", terminalHandler);
+            server.createContext("/api/control", controlHandler);
+            server.createContext("/api/logs", logsHandler);
+            server.createContext("/api/memories", memoriesHandler);
+            server.createContext("/api/health", healthHandler);
+
+            // Aliases with /mobile prefix for resilience
+            server.createContext("/mobile/api/chat", chatHandler);
+            server.createContext("/mobile/api/storage", storageHandler);
+            server.createContext("/mobile/api/system", systemHandler);
+            server.createContext("/mobile/api/status", statusHandler);
+            server.createContext("/mobile/api/terminal", terminalHandler);
+            server.createContext("/mobile/api/control", controlHandler);
+            server.createContext("/mobile/api/logs", logsHandler);
+            server.createContext("/mobile/api/memories", memoriesHandler);
+            server.createContext("/mobile/api/health", healthHandler);
 
             // PWA & Web App static assets
             server.createContext("/manifest.json", new ManifestHandler());
@@ -72,8 +93,15 @@ public class LocalApiServer {
             server.createContext("/", new WebUiHandler());
 
             server.start();
+
+            String detectedIp = "192.168.1.7";
+            try (java.net.DatagramSocket s = new java.net.DatagramSocket()) {
+                s.connect(java.net.InetAddress.getByName("8.8.8.8"), 10002);
+                detectedIp = s.getLocalAddress().getHostAddress();
+            } catch (Exception ignored) {}
+
             Logger.success("Server", "Servidor HTTP local do Cornelius ativo em: http://localhost:" + port);
-            Logger.info("Server", "Acesse no celular Android pela mesma rede Wi-Fi via: http://192.168.1.5:" + port);
+            Logger.info("Server", "Acesse no celular Android pela mesma rede Wi-Fi via: http://" + detectedIp + ":" + port + "/mobile");
         } catch (Exception e) {
             Logger.warn("Server", "Aviso no servidor HTTP: " + e.getMessage());
         }

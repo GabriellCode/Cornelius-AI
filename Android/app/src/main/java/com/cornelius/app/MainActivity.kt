@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private val PREFS_NAME = "CorneliusPrefs"
     private val KEY_SERVER_URL = "server_url"
-    private val DEFAULT_SERVER_URL = "http://192.168.1.5:8080/mobile"
+    private val DEFAULT_SERVER_URL = "http://192.168.1.7:8080/mobile"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
