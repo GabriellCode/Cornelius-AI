@@ -28,11 +28,17 @@ import java.util.concurrent.Executors;
 public class LocalApiServer {
     private final CorneliusBrain brain;
     private final CorneliusConfig config;
+    private final com.cornelius.bot.DiscordBotService discordBotService;
     private HttpServer server;
 
     public LocalApiServer(CorneliusBrain brain, CorneliusConfig config) {
+        this(brain, config, null);
+    }
+
+    public LocalApiServer(CorneliusBrain brain, CorneliusConfig config, com.cornelius.bot.DiscordBotService discordBotService) {
         this.brain = brain;
         this.config = config;
+        this.discordBotService = discordBotService;
     }
 
     public void start() {
@@ -341,29 +347,33 @@ public class LocalApiServer {
                     }
                     case "open_url" -> {
                         if (param != null && !param.isBlank()) {
-                            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                                Desktop.getDesktop().browse(new URI(param));
-                            }
+                            openUrlInHost(param);
                             resp.put("success", true);
-                            resp.put("message", "URL aberta no PC: " + param);
+                            resp.put("message", "Navegador aberto no computador: " + param);
                         } else {
                             resp.put("error", "URL inválida");
                         }
                     }
                     case "open_instagram" -> {
-                        brain.getInstagramTool().openInstagramWeb();
+                        String user = config.getInstagramUsername();
+                        String url = (user != null && !user.isBlank())
+                                ? "https://www.instagram.com/" + user + "/"
+                                : "https://www.instagram.com/";
+                        openUrlInHost(url);
                         resp.put("success", true);
                         resp.put("message", "Instagram aberto no computador.");
                     }
                     case "open_directs" -> {
-                        brain.getInstagramTool().openDirects();
+                        openUrlInHost("https://www.instagram.com/direct/inbox/");
                         resp.put("success", true);
                         resp.put("message", "Directs do Instagram abertos no computador.");
                     }
                     case "restart_bot" -> {
                         Thread.ofVirtual().start(() -> {
                             try {
-                                if (SystemProfile.isWindows()) {
+                                if (discordBotService != null) {
+                                    discordBotService.start();
+                                } else if (SystemProfile.isWindows()) {
                                     new ProcessBuilder("cmd.exe", "/c", "run-discord-bot.bat").start();
                                 } else {
                                     new ProcessBuilder("systemctl", "--user", "restart", "cornelius.service").start();
@@ -643,5 +653,34 @@ public class LocalApiServer {
             }
         } catch (Exception ignored) {}
         return "<!DOCTYPE html><html><head><title>Cornelius AI</title></head><body style='background:#09090b;color:#fff;font-family:sans-serif;padding:20px;'><h2>Cornelius.AI Server Active</h2><p>Acesse o painel no aplicativo Android ou navegador.</p></body></html>";
+    }
+
+    public static void openUrlInHost(String url) {
+        if (url == null || url.isBlank()) return;
+        url = url.trim();
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+        }
+
+        try {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(new URI(url));
+                Logger.info("Server", "URL aberta via Desktop.browse: " + url);
+                return;
+            }
+        } catch (Throwable ignored) {}
+
+        try {
+            if (SystemProfile.isWindows()) {
+                new ProcessBuilder("cmd.exe", "/c", "start", "", url).start();
+                Logger.info("Server", "URL aberta no Windows via cmd start: " + url);
+            } else if (SystemProfile.isMac()) {
+                new ProcessBuilder("open", url).start();
+            } else {
+                new ProcessBuilder("xdg-open", url).start();
+            }
+        } catch (Throwable t) {
+            Logger.error("Server", "Erro ao abrir URL no host: " + t.getMessage());
+        }
     }
 }

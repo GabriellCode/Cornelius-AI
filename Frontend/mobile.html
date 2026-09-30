@@ -895,6 +895,27 @@
         </div>
     </div>
 
+    <!-- MODAL ABRIR URL NO PC -->
+    <div class="modal-overlay" id="url-modal" onclick="if(event.target===this) closeUrlModal()">
+        <div class="modal-card">
+            <h2>🌐 Abrir Navegador no Computador</h2>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+                Escolha um atalho ou digite o site para abrir no seu PC:
+            </p>
+            <input type="text" id="input-browse-url" placeholder="https://google.com" value="https://google.com">
+            <div class="quick-commands" style="padding:0; margin:4px 0 8px 0; justify-content:center;">
+                <div class="cmd-pill" onclick="setQuickUrl('https://google.com')">Google</div>
+                <div class="cmd-pill" onclick="setQuickUrl('https://youtube.com')">YouTube</div>
+                <div class="cmd-pill" onclick="setQuickUrl('https://web.whatsapp.com')">WhatsApp</div>
+                <div class="cmd-pill" onclick="setQuickUrl('https://github.com')">GitHub</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button type="button" class="action-btn" style="flex:1;" onclick="closeUrlModal()">Cancelar</button>
+                <button type="button" class="action-btn primary" style="flex:1;" onclick="submitOpenUrl()">Abrir no PC</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // GLOBAL ERROR HANDLER
         window.onerror = function(msg, url, line, col, error) {
@@ -1123,9 +1144,36 @@
         }
 
         function promptOpenUrl() {
-            const url = prompt('Digite a URL para abrir no PC:', 'https://google.com');
-            if (url) {
-                sendControlAction('open_url', url);
+            const m = document.getElementById('url-modal');
+            if (m) {
+                m.classList.add('active');
+                const inp = document.getElementById('input-browse-url');
+                if (inp) {
+                    inp.focus();
+                    inp.select();
+                }
+            } else {
+                sendControlAction('open_url', 'https://google.com');
+            }
+        }
+
+        function closeUrlModal() {
+            const m = document.getElementById('url-modal');
+            if (m) m.classList.remove('active');
+        }
+
+        function setQuickUrl(url) {
+            const inp = document.getElementById('input-browse-url');
+            if (inp) inp.value = url;
+            submitOpenUrl();
+        }
+
+        function submitOpenUrl() {
+            const inp = document.getElementById('input-browse-url');
+            const val = inp ? inp.value.trim() : 'https://google.com';
+            if (val) {
+                closeUrlModal();
+                sendControlAction('open_url', val);
             }
         }
 

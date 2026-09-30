@@ -82,31 +82,14 @@ public class InstagramTool {
         String url = (user != null && !user.isBlank())
                 ? "https://www.instagram.com/" + user + "/"
                 : "https://www.instagram.com/";
-
-        try {
-            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                Desktop.getDesktop().browse(URI.create(url));
-            } else {
-                new ProcessBuilder("xdg-open", url).start();
-            }
-            return "📸 Instagram aberto com sucesso no seu navegador: " + url;
-        } catch (Exception e) {
-            return "⚠️ Não foi possível abrir o navegador automaticamente: " + e.getMessage() + ". Acesse: " + url;
-        }
+        com.cornelius.server.LocalApiServer.openUrlInHost(url);
+        return "📸 Instagram aberto com sucesso no seu navegador: " + url;
     }
 
     public String openDirects() {
         String url = "https://www.instagram.com/direct/inbox/";
-        try {
-            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                Desktop.getDesktop().browse(URI.create(url));
-            } else {
-                new ProcessBuilder("xdg-open", url).start();
-            }
-            return "📩 Caixa de Mensagens Diretas (Directs) do Instagram aberta no navegador!";
-        } catch (Exception e) {
-            return "⚠️ Acesse suas mensagens diretas em: " + url;
-        }
+        com.cornelius.server.LocalApiServer.openUrlInHost(url);
+        return "📩 Caixa de Mensagens Diretas (Directs) do Instagram aberta no navegador!";
     }
 
     public String checkProfile(String username) {

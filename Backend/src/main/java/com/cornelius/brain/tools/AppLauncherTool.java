@@ -72,18 +72,8 @@ public class AppLauncherTool implements AgentTool {
     }
 
     private String openUrl(String url) {
-        try {
-            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                Desktop.getDesktop().browse(URI.create(url));
-            } else if (SystemProfile.isWindows()) {
-                new ProcessBuilder("cmd.exe", "/c", "start", url).start();
-            } else {
-                new ProcessBuilder("xdg-open", url).start();
-            }
-            return "Página aberta no seu navegador padrão: " + url;
-        } catch (Exception e) {
-            return "Erro ao abrir URL no navegador: " + e.getMessage();
-        }
+        com.cornelius.server.LocalApiServer.openUrlInHost(url);
+        return "Página aberta no seu navegador padrão: " + url;
     }
 
     private String controlAudio(String lower) {

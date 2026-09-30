@@ -17,15 +17,15 @@ public class Main {
         CorneliusConfig config = CorneliusConfig.load();
         CorneliusBrain brain = new CorneliusBrain(config);
 
-        // Start Local API Server in background
-        LocalApiServer apiServer = new LocalApiServer(brain, config);
-        apiServer.start();
-
         // Start Discord Bot Service in background (for mobile chatting)
         com.cornelius.bot.DiscordBotService discordBot = new com.cornelius.bot.DiscordBotService(brain, config);
         if (config.getDiscordToken() != null && !config.getDiscordToken().isBlank()) {
             discordBot.start();
         }
+
+        // Start Local API Server in background
+        LocalApiServer apiServer = new LocalApiServer(brain, config, discordBot);
+        apiServer.start();
 
         // Register shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
