@@ -317,7 +317,24 @@ public class LocalApiServer {
                     }
                     case "lock_pc" -> {
                         if (SystemProfile.isWindows()) {
-                            new ProcessBuilder("rundll32.exe", "user32.dll,LockWorkStation").start();
+                            // Method 1: cmd.exe /c unquoted rundll32
+                            try {
+                                new ProcessBuilder("cmd.exe", "/c", "rundll32.exe user32.dll,LockWorkStation").start();
+                            } catch (Exception e) {
+                                Logger.warn("Server", "Falha cmd rundll32: " + e.getMessage());
+                            }
+                            // Method 2: C:\Windows\System32\tsdiscon.exe
+                            try {
+                                new ProcessBuilder("C:\\Windows\\System32\\tsdiscon.exe").start();
+                            } catch (Exception ignored) {}
+                            // Method 3: PowerShell direct LockWorkStation
+                            try {
+                                new ProcessBuilder("powershell.exe", "-NoProfile", "-NonInteractive", "-Command", "rundll32.exe user32.dll,LockWorkStation").start();
+                            } catch (Exception ignored) {}
+                        } else {
+                            try {
+                                new ProcessBuilder("sh", "-c", "loginctl lock-session || xdg-screensaver lock || gnome-screensaver-command -l").start();
+                            } catch (Exception ignored) {}
                         }
                         resp.put("success", true);
                         resp.put("message", "Computador bloqueado com sucesso.");
