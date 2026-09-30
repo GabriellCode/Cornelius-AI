@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/cornelius.png">
+    <title>Cornelius.AI Mobile</title>
+    <style>
+        :root {
+            --bg-void: #09090b;
+            --bg-surface: #121215;
+            --bg-card: #18181c;
+            --bg-card-hover: #222228;
+            --border-dim: #27272e;
+            --border-light: #383844;
+            --accent-green: #22c55e;
+            --accent-cyan: #38bdf8;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --text-dim: #71717a;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'SF Mono', Menlo, Consolas, Monaco, 'Courier New', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: var(--font-sans);
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--text-main);
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.06) 0%, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+        }
+
+        /* TOP APP BAR */
+        header.app-bar {
+            height: 56px;
+            background: rgba(18, 18, 21, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-dim);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--accent-cyan);
+            overflow: hidden;
+        }
+
+        .brand-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-info h1 {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-info small {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            display: block;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--accent-green);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            cursor: pointer;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.85); opacity: 0.5; }
+        }
+
+        /* MAIN VIEWS CONTAINER */
+        main#views-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .view-tab {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 14px;
+            gap: 14px;
+        }
+
+        .view-tab.active {
+            display: flex;
+        }
+
+        /* BOTTOM NAVIGATION BAR */
+        nav.bottom-nav {
+            height: 60px;
+            background: rgba(18, 18, 21, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-dim);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 6px;
+            padding-bottom: env(safe-area-inset-bottom);
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            flex: 1;
+            height: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn .icon {
+            font-size: 20px;
+            line-height: 1;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-btn .label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .nav-btn.active {
+            color: var(--text-main);
+        }
+
+        .nav-btn.active .icon {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+        }
+
+        .nav-btn.active .label {
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        /* --- ABA 1: CONVERSA --- */
+        #view-chat {
+            padding: 12px;
+            gap: 12px;
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+
+        #view-chat.active {
+            display: flex;
+        }
+
+        #chat-messages {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 74px;
+            min-height: 0;
+        }
+
+        .chat-bubble {
+            max-width: 88%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.55;
+            word-break: break-word;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end;
+            background: #2563eb;
+            color: #ffffff;
+            border-bottom-right-radius: 3px;
+        }
+
+        .chat-bubble.assistant {
+            align-self: flex-start;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            color: var(--text-main);
+            border-bottom-left-radius: 3px;
+        }
+
+        .chat-bubble .meta {
+            font-size: 10.5px;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+            font-family: var(--font-mono);
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .chat-bubble.user .meta {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tool-badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-family: var(--font-mono);
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+
+        .chat-input-bar {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(24, 24, 28, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: 28px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-input-bar input {
+            flex: 1;
+            height: 42px;
+            background: transparent;
+            border: none;
+            padding: 0 8px;
+            color: var(--text-main);
+            font-size: 14.5px;
+            outline: none;
+        }
+
+        .round-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-dim);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .round-btn:active {
+            transform: scale(0.92);
+        }
+
+        .round-btn.send {
+            background: var(--accent-cyan);
+            color: #09090b;
+            border: none;
+            font-weight: bold;
+        }
+
+        /* --- ABA 2: CONTROLE --- */
+        .section-header {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            margin-top: 4px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .control-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .control-card:active {
+            background: var(--bg-card-hover);
+            transform: scale(0.98);
+        }
+
+        .control-card .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .control-card .card-icon {
+            font-size: 22px;
+        }
+
+        .control-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .control-card p {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        .action-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 4px;
+            transition: all 0.15s;
+        }
+
+        .action-btn:active {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .action-btn.primary {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: rgba(56, 189, 248, 0.4);
+            color: var(--accent-cyan);
+        }
+
+        /* --- ABA 3: STATUS --- */
+        .telemetry-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .metric-title {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .metric-val {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .meter-bar {
+            height: 8px;
+            background: var(--bg-surface);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-dim);
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #22c55e);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .logs-console {
+            background: #090a0f;
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #38bdf8;
+            height: 160px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.45;
+        }
+
+        /* --- ABA 4: TERMINAL --- */
+        #view-terminal {
+            padding: 12px;
+            gap: 10px;
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+
+        #view-terminal.active {
+            display: flex;
+        }
+
+        .quick-commands {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 2px 0;
+            flex-shrink: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cmd-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-dim);
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .cmd-pill:active {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .terminal-window {
+            flex: 1;
+            background: #090a0f;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #4ade80;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            min-height: 0;
+            padding-bottom: 74px;
+        }
+
+        .terminal-line {
+            line-height: 1.5;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .terminal-line.cmd {
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .terminal-line.err {
+            color: #ef4444;
+        }
+
+        .terminal-line.meta {
+            color: var(--text-dim);
+            font-size: 10.5px;
+        }
+
+        /* TOAST */
+        #toast {
+            position: fixed;
+            top: 68px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(24, 24, 28, 0.98);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-light);
+            color: var(--text-main);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            z-index: 100;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* MODAL DE CONEXAO */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 200;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-card h2 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-card input {
+            height: 44px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 0 12px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <header class="app-bar">
+        <div class="brand-container">
+            <div class="brand-avatar">
+                <img src="/cornelius.png" alt="C" onerror="this.style.display='none'; this.parentElement.innerText='C';">
+            </div>
+            <div class="brand-info">
+                <h1>Cornelius.AI</h1>
+                <small id="sub-ip">PC: 192.168.1.5:8080</small>
+            </div>
+        </div>
+        <div class="status-pill" id="status-pill-btn">
+            <div class="status-dot"></div>
+            <span id="header-status">ONLINE</span>
+        </div>
+    </header>
+
+    <!-- MAIN VIEWS -->
+    <main id="views-container">
+
+        <!-- 1. ABA DE CONVERSA -->
+        <div id="view-chat" class="view-tab active">
+            <div id="chat-messages">
+                <div class="chat-bubble assistant">
+                    <div class="meta"><span>CORNELIUS AI</span> <span>SISTEMA</span></div>
+                    Saudacoes! Estou conectado ao seu computador. Como posso servi-lo hoje atraves do seu dispositivo Android?
+                </div>
+            </div>
+
+            <div class="chat-input-bar">
+                <button type="button" class="round-btn" id="voice-btn" title="Falar">🎙️</button>
+                <input type="text" id="chat-input" placeholder="Pergunte ao Cornelius..." autocomplete="off">
+                <button type="button" class="round-btn send" id="chat-send-btn" title="Enviar">➤</button>
+            </div>
+        </div>
+
+        <!-- 2. ABA DE CONTROLE -->
+        <div id="view-control" class="view-tab">
+            <div class="section-header">🤖 Discord Gateway</div>
+            <div class="control-grid">
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">⚡</span>
+                        <small id="ctrl-discord-status" style="color:var(--accent-green); font-family:var(--font-mono); font-weight:bold;">ATIVO</small>
+                    </div>
+                    <h3>Bot Discord</h3>
+                    <p>Comunicacao 24/7 de mensagens no celular via Discord.</p>
+                    <button type="button" class="action-btn primary" onclick="sendControlAction('restart_bot')">🔄 Reiniciar Bot</button>
+                </div>
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">🚀</span>
+                        <small id="ctrl-autostart-status" style="font-family:var(--font-mono);">BOOT</small>
+                    </div>
+                    <h3>Autostart PC</h3>
+                    <p>Inicializacao silenciosa junto com o Windows/Linux.</p>
+                    <button type="button" class="action-btn" onclick="sendControlAction('toggle_autostart')">⚡ Alternar Boot</button>
+                </div>
+            </div>
+
+            <div class="section-header">💾 Cofre de 1TB & Memorias</div>
+            <div class="control-grid">
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">🗄️</span>
+                        <small id="ctrl-vault-ratio" style="color:var(--accent-cyan); font-family:var(--font-mono);">.CZIP</small>
+                    </div>
+                    <h3>Cofre 1TB</h3>
+                    <p>Sincronizar sessoes e persistir indices no HD externo.</p>
+                    <button type="button" class="action-btn" onclick="sendControlAction('save_vault')">💾 Salvar no HD</button>
+                </div>
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">🧹</span>
+                    </div>
+                    <h3>Conversas</h3>
+                    <p>Limpar historico da sessao atual do assistente.</p>
+                    <button type="button" class="action-btn" onclick="sendControlAction('clear_chat')">Limpar Chat</button>
+                </div>
+            </div>
+
+            <div class="section-header">💻 Acoes do Computador</div>
+            <div class="control-grid">
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">🔒</span>
+                    </div>
+                    <h3>Bloquear PC</h3>
+                    <p>Tranca a tela do Windows instantaneamente.</p>
+                    <button type="button" class="action-btn" onclick="sendControlAction('lock_pc')">Bloquear Agora</button>
+                </div>
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">🌐</span>
+                    </div>
+                    <h3>Navegador</h3>
+                    <p>Abrir Google ou link especificado no PC.</p>
+                    <button type="button" class="action-btn" onclick="promptOpenUrl()">Abrir Link</button>
+                </div>
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">📸</span>
+                    </div>
+                    <h3>Instagram</h3>
+                    <p>Abrir pagina inicial do Instagram no PC.</p>
+                    <button type="button" class="action-btn" onclick="sendControlAction('open_instagram')">Abrir Feed</button>
+                </div>
+                <div class="control-card">
+                    <div class="card-top">
+                        <span class="card-icon">📩</span>
+                    </div>
+                    <h3>Directs</h3>
+                    <p>Abrir caixa de mensagens do Instagram.</p>
+                    <button type="button" class="action-btn" onclick="sendControlAction('open_directs')">Abrir Directs</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ABA DE STATUS -->
+        <div id="view-status" class="view-tab">
+            <div class="telemetry-card">
+                <div class="metric-row">
+                    <span class="metric-title">🖥️ Processador (CPU)</span>
+                    <span class="metric-val" id="tele-cpu-cores">-- Nucleos</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-title">⚡ Perfil de Potencia</span>
+                    <span class="metric-val" id="tele-power-tier" style="color:var(--accent-cyan);">HIGH_PERFORMANCE</span>
+                </div>
+            </div>
+
+            <div class="telemetry-card">
+                <div class="metric-row">
+                    <span class="metric-title">🧠 Memoria RAM Total</span>
+                    <span class="metric-val" id="tele-ram-total">32.0 GB</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-title">☕ JVM Heap Alocado</span>
+                    <span class="metric-val" id="tele-jvm-heap">-- MB / 4096 MB</span>
+                </div>
+                <div class="meter-bar">
+                    <div id="meter-jvm-fill" class="meter-fill" style="width: 25%;"></div>
+                </div>
+            </div>
+
+            <div class="telemetry-card">
+                <div class="metric-row">
+                    <span class="metric-title">💽 Armazenamento em Disco</span>
+                    <span class="metric-val">Particoes</span>
+                </div>
+                <div id="disks-list" style="display:flex; flex-direction:column; gap:8px;">
+                    <small style="color:var(--text-dim)">Carregando discos...</small>
+                </div>
+            </div>
+
+            <div class="telemetry-card">
+                <div class="metric-row">
+                    <span class="metric-title">📜 Console de Logs em Tempo Real</span>
+                    <button type="button" class="action-btn" style="padding:2px 8px; font-size:10px;" onclick="fetchLogs()">🔄 Atualizar</button>
+                </div>
+                <div class="logs-console" id="logs-box">Aguardando telemetria...</div>
+            </div>
+        </div>
+
+        <!-- 4. ABA DE TERMINAL INTERATIVO -->
+        <div id="view-terminal" class="view-tab">
+            <div class="quick-commands">
+                <div class="cmd-pill" onclick="runQuickCmd('ipconfig')">ipconfig</div>
+                <div class="cmd-pill" onclick="runQuickCmd('dir')">dir</div>
+                <div class="cmd-pill" onclick="runQuickCmd('Get-Process | select -first 10')">Get-Process</div>
+                <div class="cmd-pill" onclick="runQuickCmd('whoami')">whoami</div>
+                <div class="cmd-pill" onclick="runQuickCmd('netstat -ano | findstr 8080')">netstat :8080</div>
+                <div class="cmd-pill" onclick="clearTerminal()">clear</div>
+            </div>
+
+            <div class="terminal-window" id="terminal-screen">
+                <div class="terminal-line meta">CORNELIUS AI // REMOTE POWERSHELL CONSOLE [PRONTO]</div>
+                <div class="terminal-line meta">Digite qualquer comando abaixo para executar no computador.</div>
+            </div>
+
+            <div class="chat-input-bar">
+                <span style="font-family:var(--font-mono); font-size:12px; color:var(--accent-cyan); font-weight:bold;">PS&gt;</span>
+                <input type="text" id="terminal-input" placeholder="ex: dir, Get-Process, ipconfig..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="font-family:var(--font-mono); font-size:13px;">
+                <button type="button" class="round-btn send" id="terminal-send-btn" title="Executar">↵</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <button type="button" class="nav-btn active" onclick="switchTab('chat')">
+            <div class="icon">💬</div>
+            <div class="label">Conversa</div>
+        </button>
+        <button type="button" class="nav-btn" onclick="switchTab('control')">
+            <div class="icon">🎛️</div>
+            <div class="label">Controle</div>
+        </button>
+        <button type="button" class="nav-btn" onclick="switchTab('status')">
+            <div class="icon">📊</div>
+            <div class="label">Status</div>
+        </button>
+        <button type="button" class="nav-btn" onclick="switchTab('terminal')">
+            <div class="icon">💻</div>
+            <div class="label">Terminal</div>
+        </button>
+    </nav>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast">
+        <span id="toast-icon">⚡</span>
+        <span id="toast-text">Comando executado</span>
+    </div>
+
+    <!-- MODAL DE CONEXAO -->
+    <div class="modal-overlay" id="settings-modal" onclick="if(event.target===this) closeSettingsModal()">
+        <div class="modal-card">
+            <h2>⚙️ Conexao com o Computador</h2>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+                Endereco IP e porta onde o Cornelius esta rodando no PC:
+            </p>
+            <input type="text" id="input-api-url" placeholder="http://192.168.1.5:8080">
+            <div style="display:flex; gap:8px;">
+                <button type="button" class="action-btn" style="flex:1;" onclick="closeSettingsModal()">Cancelar</button>
+                <button type="button" class="action-btn primary" style="flex:1;" onclick="saveApiUrl()">Salvar & Conectar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL ERROR HANDLER
+        window.onerror = function(msg, url, line, col, error) {
+            console.error("Global JS Error: " + msg + " at " + line + ":" + col);
+            return false;
+        };
+
+        // CONFIG & STATE
+        let API_BASE = localStorage.getItem('cornelius_api_url') || window.location.origin;
+        if (!API_BASE || API_BASE === 'null' || API_BASE.startsWith('file:')) {
+            API_BASE = 'http://192.168.1.5:8080';
+        }
+
+        const subIpEl = document.getElementById('sub-ip');
+        if (subIpEl) subIpEl.innerText = API_BASE.replace(/^https?:\/\//, '');
+
+        function showToast(text, icon) {
+            const iconStr = icon || '⚡';
+            const t = document.getElementById('toast');
+            if (t) {
+                document.getElementById('toast-icon').innerText = iconStr;
+                document.getElementById('toast-text').innerText = text;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 2500);
+            }
+        }
+
+        function openSettingsModal() {
+            document.getElementById('input-api-url').value = API_BASE;
+            document.getElementById('settings-modal').classList.add('active');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('active');
+        }
+
+        function saveApiUrl() {
+            let val = document.getElementById('input-api-url').value.trim();
+            if (val) {
+                if (!val.startsWith('http://') && !val.startsWith('https://')) {
+                    val = 'http://' + val;
+                }
+                API_BASE = val;
+                localStorage.setItem('cornelius_api_url', API_BASE);
+                if (subIpEl) subIpEl.innerText = API_BASE.replace(/^https?:\/\//, '');
+                closeSettingsModal();
+                showToast('Servidor atualizado!', '✅');
+                fetchStatus();
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function formatMarkdown(text) {
+            if (!text) return '';
+            return escapeHtml(text)
+                .replace(/^### (.*$)/gim, '<h3 style="color:#ffffff; margin:6px 0 3px 0; font-size:13.5px;">$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2 style="color:#ffffff; margin:8px 0 4px 0; font-size:14.5px;">$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1 style="color:#ffffff; margin:10px 0 5px 0; font-size:15.5px;">$1</h1>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong style="color:#ffffff;">$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em style="color:#a1a1aa;">$1</em>')
+                .replace(new RegExp('`([^`]+)`', 'gim'), '<code style="background:#27272a; padding:1px 5px; border-radius:4px; font-family:monospace; font-size:12px; color:#38bdf8;">$1</code>')
+                .replace(/^- (.*$)/gim, '<span style="color:#71717a;">•</span> $1<br>')
+                .replace(/\n/g, '<br>');
+        }
+
+        // TAB NAVIGATION
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.view-tab').forEach(v => v.classList.remove('active'));
+
+            const tabMap = {
+                'chat': { btnIdx: 0, viewId: 'view-chat' },
+                'control': { btnIdx: 1, viewId: 'view-control' },
+                'status': { btnIdx: 2, viewId: 'view-status' },
+                'terminal': { btnIdx: 3, viewId: 'view-terminal' }
+            };
+
+            const target = tabMap[tabName];
+            if (target) {
+                const btn = document.querySelectorAll('.nav-btn')[target.btnIdx];
+                const view = document.getElementById(target.viewId);
+                if (btn) btn.classList.add('active');
+                if (view) view.classList.add('active');
+            }
+
+            if (tabName === 'status') {
+                fetchStatus();
+                fetchLogs();
+            }
+        }
+
+        // 1. CHAT FUNCTIONALITY
+        async function handleSendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+
+            const container = document.getElementById('chat-messages');
+
+            // User Message
+            const userEl = document.createElement('div');
+            userEl.className = 'chat-bubble user';
+            userEl.innerHTML = `<div class="meta"><span>VOCE</span></div><div>${escapeHtml(msg)}</div>`;
+            container.appendChild(userEl);
+            container.scrollTop = container.scrollHeight;
+
+            // Assistant Placeholder
+            const botEl = document.createElement('div');
+            botEl.className = 'chat-bubble assistant';
+            botEl.innerHTML = `<div class="meta"><span>CORNELIUS</span> <span>Raciocinando...</span></div><p style="color:var(--text-muted)">Consultando ferramentas...</p>`;
+            container.appendChild(botEl);
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg })
+                });
+                const data = await res.json();
+
+                let toolsBadges = '';
+                if (data.tools && data.tools.length > 0) {
+                    toolsBadges = data.tools.map(t => `<span class="tool-badge">// ${t}</span>`).join(' ') + '<br><br>';
+                }
+
+                botEl.innerHTML = `<div class="meta"><span>CORNELIUS // ${(data.provider||'IA').toUpperCase()}</span> <span>${data.timeMs||0}ms</span></div>${toolsBadges}${formatMarkdown(data.response || '')}`;
+            } catch (err) {
+                botEl.innerHTML = `<div class="meta"><span>CORNELIUS // ERRO</span></div><span style="color:var(--accent-red)">Falha de conexao com ${API_BASE}: ${escapeHtml(err.message)}</span>`;
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function toggleVoiceInput() {
+            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!Speech) {
+                showToast('Voz nao suportada neste navegador', '⚠️');
+                return;
+            }
+            const rec = new Speech();
+            rec.lang = 'pt-BR';
+            rec.continuous = false;
+            rec.interimResults = false;
+
+            showToast('Ouvindo...', '🎙️');
+            rec.onresult = (e) => {
+                const text = e.results[0][0].transcript;
+                document.getElementById('chat-input').value = text;
+                showToast('Audio capturado!', '✨');
+            };
+            rec.onerror = () => showToast('Nao entendi o audio', '❌');
+            rec.start();
+        }
+
+        // 2. CONTROL ACTIONS
+        async function sendControlAction(action, param) {
+            const p = param || '';
+            showToast('Enviando comando...', '⏳');
+            try {
+                const res = await fetch(`${API_BASE}/api/control`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: action, param: p })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message || 'Sucesso!', '✅');
+                    if (action === 'clear_chat') {
+                        document.getElementById('chat-messages').innerHTML = '<div class="chat-bubble assistant"><div class="meta"><span>CORNELIUS AI</span></div>Historico esvaziado com sucesso.</div>';
+                    }
+                    fetchStatus();
+                } else {
+                    showToast(data.error || 'Erro na acao', '❌');
+                }
+            } catch (e) {
+                showToast('Erro de rede: ' + e.message, '❌');
+            }
+        }
+
+        function promptOpenUrl() {
+            const url = prompt('Digite a URL para abrir no PC:', 'https://google.com');
+            if (url) {
+                sendControlAction('open_url', url);
+            }
+        }
+
+        // 3. TELEMETRY & STATUS
+        async function fetchStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/api/status`);
+                const data = await res.json();
+
+                document.getElementById('header-status').innerText = 'ONLINE';
+                document.getElementById('tele-cpu-cores').innerText = `${data.cpuCores} Nucleos (${data.osName})`;
+                document.getElementById('tele-power-tier').innerText = data.powerTier || 'BALANCED';
+
+                if (data.ram) {
+                    document.getElementById('tele-ram-total').innerText = `${data.ram.totalRamGb.toFixed(1)} GB RAM Total`;
+                    document.getElementById('tele-jvm-heap').innerText = `${data.ram.jvmUsedMb} MB / ${data.ram.jvmMaxMb} MB (${data.ram.jvmPercent}%)`;
+                    const jvmBar = document.getElementById('meter-jvm-fill');
+                    if (jvmBar) {
+                        jvmBar.style.width = `${Math.min(100, data.ram.jvmPercent)}%`;
+                    }
+                }
+
+                // Disks
+                if (data.disks && data.disks.length > 0) {
+                    const list = document.getElementById('disks-list');
+                    if (list) {
+                        list.innerHTML = '';
+                        data.disks.forEach(d => {
+                            list.innerHTML += `
+                                <div style="display:flex; flex-direction:column; gap:4px;">
+                                    <div style="display:flex; justify-content:space-between; font-size:12px;">
+                                        <span>Disco ${d.path}</span>
+                                        <span style="font-family:var(--font-mono);">${d.freeGb} GB livres / ${d.totalGb} GB (${d.percent}%)</span>
+                                    </div>
+                                    <div class="meter-bar">
+                                        <div class="meter-fill" style="width:${d.percent}%;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+
+                // Autostart
+                const autoEl = document.getElementById('ctrl-autostart-status');
+                if (autoEl) {
+                    autoEl.innerText = data.autostartEnabled ? 'HABILITADO' : 'DESABILITADO';
+                    autoEl.style.color = data.autostartEnabled ? 'var(--accent-green)' : 'var(--accent-amber)';
+                }
+
+                // Discord
+                const discEl = document.getElementById('ctrl-discord-status');
+                if (discEl) {
+                    discEl.innerText = data.discordOnline ? 'ONLINE' : 'OFFLINE';
+                    discEl.style.color = data.discordOnline ? 'var(--accent-green)' : 'var(--accent-red)';
+                }
+
+                // Vault ratio
+                const vaultEl = document.getElementById('ctrl-vault-ratio');
+                if (vaultEl && data.vault) {
+                    vaultEl.innerText = `SAVINGS: ${Number(data.vault.savingsRatio).toFixed(1)}%`;
+                }
+
+            } catch (e) {
+                document.getElementById('header-status').innerText = 'OFFLINE';
+            }
+        }
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch(`${API_BASE}/api/logs`);
+                const data = await res.json();
+                const box = document.getElementById('logs-box');
+                if (box) {
+                    box.innerText = data.logs || 'Sem logs disponiveis.';
+                    box.scrollTop = box.scrollHeight;
+                }
+            } catch (e) {}
+        }
+
+        // 4. INTERACTIVE TERMINAL
+        async function handleSendTerminal() {
+            const input = document.getElementById('terminal-input');
+            const cmd = input.value.trim();
+            if (!cmd) return;
+            input.value = '';
+
+            executeTerminalCommand(cmd);
+        }
+
+        function runQuickCmd(cmd) {
+            if (cmd === 'clear') {
+                clearTerminal();
+                return;
+            }
+            executeTerminalCommand(cmd);
+        }
+
+        function clearTerminal() {
+            const screen = document.getElementById('terminal-screen');
+            if (screen) {
+                screen.innerHTML = '<div class="terminal-line meta">CORNELIUS AI // REMOTE POWERSHELL CONSOLE [PRONTO]</div>';
+            }
+        }
+
+        async function executeTerminalCommand(cmd) {
+            const screen = document.getElementById('terminal-screen');
+            if (!screen) return;
+
+            const cmdLine = document.createElement('div');
+            cmdLine.className = 'terminal-line cmd';
+            cmdLine.innerText = `PS C:\\Users> ${cmd}`;
+            screen.appendChild(cmdLine);
+
+            const pendingLine = document.createElement('div');
+            pendingLine.className = 'terminal-line meta';
+            pendingLine.innerText = 'Executando no computador...';
+            screen.appendChild(pendingLine);
+            screen.scrollTop = screen.scrollHeight;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/terminal`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: cmd })
+                });
+                const data = await res.json();
+                pendingLine.remove();
+
+                const outLine = document.createElement('div');
+                outLine.className = data.exitCode === 0 ? 'terminal-line' : 'terminal-line err';
+                outLine.innerText = data.output || '(Sem saida de texto)';
+                screen.appendChild(outLine);
+
+                const metaLine = document.createElement('div');
+                metaLine.className = 'terminal-line meta';
+                metaLine.innerText = `[Concluido em ${data.timeMs || 0}ms • Codigo: ${data.exitCode}]`;
+                screen.appendChild(metaLine);
+            } catch (err) {
+                pendingLine.remove();
+                const errLine = document.createElement('div');
+                errLine.className = 'terminal-line err';
+                errLine.innerText = `Erro de rede: ${err.message}`;
+                screen.appendChild(errLine);
+            }
+            screen.scrollTop = screen.scrollHeight;
+        }
+
+        // EVENT LISTENERS SETUP
+        document.addEventListener('DOMContentLoaded', () => {
+            // Chat input handlers
+            const chatSendBtn = document.getElementById('chat-send-btn');
+            if (chatSendBtn) chatSendBtn.addEventListener('click', () => handleSendChat());
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSendChat();
+                    }
+                });
+            }
+
+            const voiceBtn = document.getElementById('voice-btn');
+            if (voiceBtn) voiceBtn.addEventListener('click', () => toggleVoiceInput());
+
+            // Terminal input handlers
+            const termSendBtn = document.getElementById('terminal-send-btn');
+            if (termSendBtn) termSendBtn.addEventListener('click', () => handleSendTerminal());
+
+            const termInput = document.getElementById('terminal-input');
+            if (termInput) {
+                termInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSendTerminal();
+                    }
+                });
+            }
+
+            // Status modal click
+            const statusPill = document.getElementById('status-pill-btn');
+            if (statusPill) statusPill.addEventListener('click', () => openSettingsModal());
+
+            // Initial calls
+            fetchStatus();
+            setInterval(fetchStatus, 4000);
+        });
+    </script>
+</body>
+</html>

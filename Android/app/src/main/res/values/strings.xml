@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Cornelius</string>
+    <string name="default_server_url">http://192.168.1.5:8080</string>
+    <string name="connecting">Conectando ao Cornelius...</string>
+    <string name="connection_error">Não foi possível conectar ao computador.</string>
+    <string name="retry">Tentar Novamente</string>
+    <string name="change_ip">Alterar IP do PC</string>
+</resources>
+

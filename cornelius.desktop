@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Cornelius AI
+GenericName=Mordomo Pessoal de Inteligência Artificial
+Comment=Assistente Pessoal com compressão em HD externo de 1TB e busca web
+Exec=java -Xms1024m -Xmx4096m -Dfile.encoding=UTF-8 -jar /home/gabriell/Documentos/APP/cornelius.jar
+Icon=/home/gabriell/Documentos/APP/cornelius.png
+Terminal=false
+Categories=Utility;Office;ArtificialIntelligence;
+StartupNotify=true
+StartupWMClass=com-cornelius-Main
+
