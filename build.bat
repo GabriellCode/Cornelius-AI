@@ -31,4 +31,6 @@ echo [CORNELIUS] Criando pacote executavel cornelius.jar...
 jar --create --file "%~dp0cornelius.jar" --main-class com.cornelius.Main -C "%~dp0Backend\bin" .
 
 echo [CORNELIUS] cornelius.jar gerado com sucesso!
+if exist "%~dp0dist-windows-portable" copy /y "%~dp0cornelius.jar" "%~dp0dist-windows-portable\cornelius.jar" >nul
+if exist "%~dp0Cornelius-Windows-Portable\dist-windows-portable" copy /y "%~dp0cornelius.jar" "%~dp0Cornelius-Windows-Portable\dist-windows-portable\cornelius.jar" >nul
 

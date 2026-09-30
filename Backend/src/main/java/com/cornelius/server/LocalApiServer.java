@@ -662,6 +662,42 @@ public class LocalApiServer {
             url = "https://" + url;
         }
 
+        if (SystemProfile.isWindows()) {
+            File chrome64 = new File("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe");
+            File chrome32 = new File("C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe");
+            File chrome = chrome64.exists() ? chrome64 : (chrome32.exists() ? chrome32 : null);
+
+            if (chrome != null) {
+                try {
+                    new ProcessBuilder(chrome.getAbsolutePath(), "--new-window", url).start();
+                    Logger.info("Server", "URL aberta via Chrome (--new-window): " + url);
+                    return;
+                } catch (Throwable t) {
+                    Logger.warn("Server", "Falha ao abrir Chrome com --new-window: " + t.getMessage());
+                }
+            }
+
+            File edge32 = new File("C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe");
+            File edge64 = new File("C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe");
+            File edge = edge32.exists() ? edge32 : (edge64.exists() ? edge64 : null);
+
+            if (edge != null) {
+                try {
+                    new ProcessBuilder(edge.getAbsolutePath(), "--new-window", url).start();
+                    Logger.info("Server", "URL aberta via Edge (--new-window): " + url);
+                    return;
+                } catch (Throwable t) {
+                    Logger.warn("Server", "Falha ao abrir Edge com --new-window: " + t.getMessage());
+                }
+            }
+
+            try {
+                new ProcessBuilder("cmd.exe", "/c", "start", "", url).start();
+                Logger.info("Server", "URL aberta no Windows via cmd start: " + url);
+                return;
+            } catch (Throwable ignored) {}
+        }
+
         try {
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                 Desktop.getDesktop().browse(new URI(url));
@@ -671,10 +707,7 @@ public class LocalApiServer {
         } catch (Throwable ignored) {}
 
         try {
-            if (SystemProfile.isWindows()) {
-                new ProcessBuilder("cmd.exe", "/c", "start", "", url).start();
-                Logger.info("Server", "URL aberta no Windows via cmd start: " + url);
-            } else if (SystemProfile.isMac()) {
+            if (SystemProfile.isMac()) {
                 new ProcessBuilder("open", url).start();
             } else {
                 new ProcessBuilder("xdg-open", url).start();

@@ -132,6 +132,18 @@
             animation: pulse 2s infinite;
         }
 
+        .status-pill.offline {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+
+        .status-pill.offline .status-dot {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            animation: none;
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(0.85); opacity: 0.5; }
@@ -656,9 +668,9 @@
             <div class="brand-avatar">
                 <img src="/cornelius.png" alt="C" onerror="this.style.display='none'; this.parentElement.innerText='C';">
             </div>
-            <div class="brand-info">
+            <div class="brand-info" onclick="openSettingsModal()" style="cursor:pointer;" title="Toque para configurar o IP de conexão">
                 <h1>Cornelius.AI</h1>
-                <small id="sub-ip">PC: 192.168.1.5:8080</small>
+                <small id="sub-ip">PC: 192.168.1.7:8080</small>
             </div>
         </div>
         <div class="status-pill" id="status-pill-btn">
@@ -868,14 +880,38 @@
     <!-- MODAL DE CONEXAO -->
     <div class="modal-overlay" id="settings-modal" onclick="if(event.target===this) closeSettingsModal()">
         <div class="modal-card">
-            <h2>⚙️ Conexao com o Computador</h2>
+            <h2>⚙️ Conexão com o Computador</h2>
             <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
-                Endereco IP e porta onde o Cornelius esta rodando no PC:
+                No celular, informe o <b>IP da rede Wi-Fi</b> onde o Cornelius está rodando (não use localhost no celular):
             </p>
-            <input type="text" id="input-api-url" placeholder="http://192.168.1.5:8080">
+            <input type="text" id="input-api-url" placeholder="http://192.168.1.7:8080">
+            <div style="font-size:11.5px; color:var(--accent-cyan); background:rgba(56,189,248,0.08); padding:8px 10px; border-radius:8px; line-height:1.4;">
+                💡 <b>IP do seu PC:</b> <span style="font-family:var(--font-mono); font-weight:bold;">192.168.1.7</span> na porta <span style="font-family:var(--font-mono); font-weight:bold;">8080</span>
+            </div>
             <div style="display:flex; gap:8px;">
                 <button type="button" class="action-btn" style="flex:1;" onclick="closeSettingsModal()">Cancelar</button>
                 <button type="button" class="action-btn primary" style="flex:1;" onclick="saveApiUrl()">Salvar & Conectar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ABRIR URL NO PC -->
+    <div class="modal-overlay" id="url-modal" onclick="if(event.target===this) closeUrlModal()">
+        <div class="modal-card">
+            <h2>🌐 Abrir Navegador no Computador</h2>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+                Escolha um atalho ou digite o site para abrir no seu PC:
+            </p>
+            <input type="text" id="input-browse-url" placeholder="https://google.com" value="https://google.com">
+            <div class="quick-commands" style="padding:0; margin:4px 0 8px 0; justify-content:center;">
+                <div class="cmd-pill" onclick="setQuickUrl('https://google.com')">Google</div>
+                <div class="cmd-pill" onclick="setQuickUrl('https://youtube.com')">YouTube</div>
+                <div class="cmd-pill" onclick="setQuickUrl('https://web.whatsapp.com')">WhatsApp</div>
+                <div class="cmd-pill" onclick="setQuickUrl('https://github.com')">GitHub</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button type="button" class="action-btn" style="flex:1;" onclick="closeUrlModal()">Cancelar</button>
+                <button type="button" class="action-btn primary" style="flex:1;" onclick="submitOpenUrl()">Abrir no PC</button>
             </div>
         </div>
     </div>
@@ -887,14 +923,53 @@
             return false;
         };
 
+        function cleanApiBase(url) {
+            if (!url) return '';
+            let cleaned = url.trim();
+            if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
+                cleaned = 'http://' + cleaned;
+            }
+            return cleaned.replace(/\/(mobile|index\.html)?\/?$/, '').replace(/\/+$/, '');
+        }
+
         // CONFIG & STATE
-        let API_BASE = localStorage.getItem('cornelius_api_url') || window.location.origin;
-        if (!API_BASE || API_BASE === 'null' || API_BASE.startsWith('file:')) {
-            API_BASE = 'http://192.168.1.5:8080';
+        let savedApi = localStorage.getItem('cornelius_api_url');
+        let currentOrigin = window.location.origin;
+        const isMobileOrApp = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.location.protocol === 'file:';
+
+        let API_BASE = '';
+        if (savedApi) {
+            API_BASE = cleanApiBase(savedApi);
+        } else if (currentOrigin && !currentOrigin.startsWith('file:') && !currentOrigin.startsWith('null')) {
+            if (isMobileOrApp && (currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1'))) {
+                API_BASE = 'http://192.168.1.7:8080';
+            } else {
+                API_BASE = cleanApiBase(currentOrigin);
+            }
+        } else {
+            API_BASE = 'http://192.168.1.7:8080';
         }
 
         const subIpEl = document.getElementById('sub-ip');
-        if (subIpEl) subIpEl.innerText = API_BASE.replace(/^https?:\/\//, '');
+        function updateSubIpDisplay() {
+            if (subIpEl) {
+                subIpEl.innerText = 'PC: ' + API_BASE.replace(/^https?:\/\//, '');
+            }
+        }
+        updateSubIpDisplay();
+
+        function setOnlineStatus(isOnline) {
+            const pill = document.getElementById('status-pill-btn');
+            const txt = document.getElementById('header-status');
+            if (!pill || !txt) return;
+            if (isOnline) {
+                txt.innerText = 'ONLINE';
+                pill.classList.remove('offline');
+            } else {
+                txt.innerText = 'OFFLINE';
+                pill.classList.add('offline');
+            }
+        }
 
         function showToast(text, icon) {
             const iconStr = icon || '⚡';
@@ -919,12 +994,9 @@
         function saveApiUrl() {
             let val = document.getElementById('input-api-url').value.trim();
             if (val) {
-                if (!val.startsWith('http://') && !val.startsWith('https://')) {
-                    val = 'http://' + val;
-                }
-                API_BASE = val;
+                API_BASE = cleanApiBase(val);
                 localStorage.setItem('cornelius_api_url', API_BASE);
-                if (subIpEl) subIpEl.innerText = API_BASE.replace(/^https?:\/\//, '');
+                updateSubIpDisplay();
                 closeSettingsModal();
                 showToast('Servidor atualizado!', '✅');
                 fetchStatus();
@@ -1072,33 +1144,76 @@
         }
 
         function promptOpenUrl() {
-            const url = prompt('Digite a URL para abrir no PC:', 'https://google.com');
-            if (url) {
-                sendControlAction('open_url', url);
+            const m = document.getElementById('url-modal');
+            if (m) {
+                m.classList.add('active');
+                const inp = document.getElementById('input-browse-url');
+                if (inp) {
+                    inp.focus();
+                    inp.select();
+                }
+            } else {
+                sendControlAction('open_url', 'https://google.com');
+            }
+        }
+
+        function closeUrlModal() {
+            const m = document.getElementById('url-modal');
+            if (m) m.classList.remove('active');
+        }
+
+        function setQuickUrl(url) {
+            const inp = document.getElementById('input-browse-url');
+            if (inp) inp.value = url;
+            submitOpenUrl();
+        }
+
+        function submitOpenUrl() {
+            const inp = document.getElementById('input-browse-url');
+            const val = inp ? inp.value.trim() : 'https://google.com';
+            if (val) {
+                closeUrlModal();
+                sendControlAction('open_url', val);
             }
         }
 
         // 3. TELEMETRY & STATUS
         async function fetchStatus() {
             try {
-                const res = await fetch(`${API_BASE}/api/status`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
+                const res = await fetch(`${API_BASE}/api/status`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
 
-                document.getElementById('header-status').innerText = 'ONLINE';
-                document.getElementById('tele-cpu-cores').innerText = `${data.cpuCores} Nucleos (${data.osName})`;
-                document.getElementById('tele-power-tier').innerText = data.powerTier || 'BALANCED';
+                setOnlineStatus(true);
+
+                const coresEl = document.getElementById('tele-cpu-cores');
+                if (coresEl) coresEl.innerText = `${data.cpuCores || '?'} Núcleos (${data.osName || 'Host'})`;
+
+                const tierEl = document.getElementById('tele-power-tier');
+                if (tierEl) tierEl.innerText = data.powerTier || 'ALTO DESEMPENHO';
 
                 if (data.ram) {
-                    document.getElementById('tele-ram-total').innerText = `${data.ram.totalRamGb.toFixed(1)} GB RAM Total`;
-                    document.getElementById('tele-jvm-heap').innerText = `${data.ram.jvmUsedMb} MB / ${data.ram.jvmMaxMb} MB (${data.ram.jvmPercent}%)`;
+                    const ramTotal = parseFloat(data.ram.totalRamGb) || 32.0;
+                    const jvmUsed = parseInt(data.ram.jvmUsedMb) || 0;
+                    const jvmMax = parseInt(data.ram.jvmMaxMb) || 4096;
+                    const jvmPct = parseInt(data.ram.jvmPercent) || 0;
+
+                    const ramEl = document.getElementById('tele-ram-total');
+                    if (ramEl) ramEl.innerText = `${ramTotal.toFixed(1)} GB RAM Total`;
+
+                    const heapEl = document.getElementById('tele-jvm-heap');
+                    if (heapEl) heapEl.innerText = `${jvmUsed} MB / ${jvmMax} MB (${jvmPct}%)`;
+
                     const jvmBar = document.getElementById('meter-jvm-fill');
-                    if (jvmBar) {
-                        jvmBar.style.width = `${Math.min(100, data.ram.jvmPercent)}%`;
-                    }
+                    if (jvmBar) jvmBar.style.width = `${Math.min(100, jvmPct)}%`;
                 }
 
                 // Disks
-                if (data.disks && data.disks.length > 0) {
+                if (data.disks && Array.isArray(data.disks)) {
                     const list = document.getElementById('disks-list');
                     if (list) {
                         list.innerHTML = '';
@@ -1135,11 +1250,12 @@
                 // Vault ratio
                 const vaultEl = document.getElementById('ctrl-vault-ratio');
                 if (vaultEl && data.vault) {
-                    vaultEl.innerText = `SAVINGS: ${Number(data.vault.savingsRatio).toFixed(1)}%`;
+                    const ratio = parseFloat(data.vault.savingsRatio) || 0;
+                    vaultEl.innerText = `SAVINGS: ${ratio.toFixed(1)}%`;
                 }
 
             } catch (e) {
-                document.getElementById('header-status').innerText = 'OFFLINE';
+                setOnlineStatus(false);
             }
         }
 
