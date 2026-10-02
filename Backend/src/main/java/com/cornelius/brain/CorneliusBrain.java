@@ -36,6 +36,7 @@ public class CorneliusBrain {
     private final FileSystemTool fileSystemTool;
     private final AppLauncherTool appLauncherTool;
     private final InstagramTool instagramTool;
+    private final GitHubSyncTool gitHubSyncTool;
 
     private final List<ChatMessage> chatHistory = new CopyOnWriteArrayList<>();
 
@@ -65,6 +66,7 @@ public class CorneliusBrain {
         this.fileSystemTool = new FileSystemTool();
         this.appLauncherTool = new AppLauncherTool();
         this.instagramTool = new InstagramTool(config);
+        this.gitHubSyncTool = new GitHubSyncTool(config);
     }
 
     public BrainResponse processUserMessage(String userMessage) {
@@ -189,6 +191,20 @@ public class CorneliusBrain {
                 toolsExecuted.add("Instagram");
             } catch (Exception e) {
                 auxiliaryContext.append("\n=== ERRO NO INSTAGRAM ===\n").append(e.getMessage()).append("\n");
+            }
+        }
+
+        // 9. GitHub 100% Java native sync trigger
+        if (lower.contains("atualize o github") || lower.contains("atualizar o github") ||
+                lower.contains("sincronize o github") || lower.contains("sincronizar o github") ||
+                lower.contains("suba pro github") || lower.contains("subir pro github") ||
+                lower.contains("sync github") || lower.contains("publicar no github")) {
+            try {
+                String syncOutput = gitHubSyncTool.execute("auto-sync via comando de chat");
+                auxiliaryContext.append("\n=== SINCRONIZAÇÃO GITHUB (JAVA 21) ===\n").append(syncOutput).append("\n");
+                toolsExecuted.add("GitHubSync");
+            } catch (Exception e) {
+                auxiliaryContext.append("\n=== ERRO GITHUB SYNC ===\n").append(e.getMessage()).append("\n");
             }
         }
 
@@ -323,6 +339,11 @@ public class CorneliusBrain {
                     case "insta":
                         executionResult = instagramTool.execute(target + (content != null && !content.isBlank() ? " ::: " + content : ""));
                         toolsExecuted.add("Action:Instagram (" + target + ")");
+                        break;
+                    case "github":
+                    case "sync_github":
+                        executionResult = gitHubSyncTool.execute(target);
+                        toolsExecuted.add("Action:GitHubSync (" + target + ")");
                         break;
                     default:
                         executionResult = appLauncherTool.execute(target);

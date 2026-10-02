@@ -81,7 +81,7 @@ public class InstagramTool {
         String user = config.getInstagramUsername();
         String url = (user != null && !user.isBlank())
                 ? "https://www.instagram.com/" + user + "/"
-                : "https://www.instagram.com/";
+                : "https://www.instagram.com/corneliusai.1/";
         com.cornelius.server.LocalApiServer.openUrlInHost(url);
         return "📸 Instagram aberto com sucesso no seu navegador: " + url;
     }

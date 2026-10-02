@@ -1,13 +1,25 @@
 # 🎩 Cornelius - Mordomo Pessoal de Inteligência Artificial
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial%20(Hb%20Head%20Black)-red.svg)](LICENSE)
+[![Instagram](https://img.shields.io/badge/Instagram-%40corneliusai.1-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/corneliusai.1/)
+[![Discord Bot](https://img.shields.io/badge/Discord-Convidar%20Bot-5865F2?logo=discord&logoColor=white)](https://discord.com/oauth2/authorize?client_id=1542459980010102784)
 [![Java](https://img.shields.io/badge/Java-21%2B-orange.svg)](https://openjdk.org/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20(Pop!_OS)-blue.svg)](#)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-blue.svg)](#)
 [![Android](https://img.shields.io/badge/Android-Client-green.svg)](Android/)
 
 **Cornelius** é o seu mordomo pessoal de inteligência artificial de alto desempenho, desenvolvido com backend **100% Java 21 nativo**. O sistema é multiplataforma, com suporte completo e otimizado para **Windows** (sistema onde roda atualmente) e **Linux (Pop!_OS / Ubuntu)**.
 
 O aplicativo opera localmente no seu computador como um assistente desktop completo, gerencia e comprime dados em um **HD externo de 1TB**, acessa a **internet em tempo real**, monitora a telemetria da máquina, controla o PC e alimenta continuamente sua base de conhecimento, além de oferecer controle remoto via **aplicativo Android e navegador**.
+
+---
+
+## 🌐 Conexões Oficiais
+
+* 📸 **Instagram Oficial:** Acompanhe o desenvolvimento e postagens do Cornelius no perfil:  
+  👉 **[@corneliusai.1](https://www.instagram.com/corneliusai.1/)**
+
+* 🤖 **Adicionar Cornelius ao Discord:** Convide o bot do Cornelius diretamente para o seu servidor Discord:  
+  👉 **[Clique aqui para autorizar e adicionar ao Discord](https://discord.com/oauth2/authorize?client_id=1542459980010102784)**
 
 ---
 
@@ -40,8 +52,13 @@ O aplicativo opera localmente no seu computador como um assistente desktop compl
    - Modo Automático com fallback inteligente caso esteja sem conexão de rede.
 
 6. **Aplicativo Mobile & Cliente Android**:
-   - 4 abas completas: **Conversa**, **Controle do Computador** (suspender, desligar, reiniciar, travar), **Status do PC** em tempo real e **Terminal Remoto** (PowerShell/Bash).
+   - 4 abas completas: **Conversa**, **Controle do Computador** (suspender, desligar, reiniciar, travar, bloquear), **Status do PC** em tempo real e **Terminal Remoto** (PowerShell/Bash).
    - Acesso rápido como **PWA** no navegador mobile ou como app nativo compilado pelo **Android Studio** na pasta `Android/`.
+
+7. **Sincronização com GitHub 100% Java 21 Nativo**:
+   - Motor próprio em Java puro utilizando a API REST Git Database (Blobs, Trees, Commits, Refs).
+   - Zero dependências externas ou scripts de shell adicionais.
+   - Atualização do repositório com 1 clique na aba Controle do aplicativo mobile, por comando no chat com o Cornelius, ou via linha de comando Java.
 
 ---
 
@@ -137,6 +154,11 @@ Para executar a validação de todos os módulos (JSON, Compressão, HD, RAG e T
 
 ---
 
-## 📄 Licença
+## 📄 Licença & Direitos Autorais (Copyright)
 
-Este projeto está licenciado sob os termos da licença [MIT](LICENSE) © 2026 GabriellCode. Consulte o arquivo [LICENSE](LICENSE) para obter todos os detalhes.
+Este projeto é protegido por direitos autorais e distribuído sob a **Licença Source-Available Não Comercial**:
+- 👁️ **Permitido:** Visualizar o código-fonte, estudar a arquitetura, compilar e executar localmente para testes, aprendizado, avaliação e uso pessoal não comercial.
+- 🚫 **Proibido:** Qualquer uso para fins comerciais, revenda, distribuição comercial, monetização direta ou indireta, ou oferta do software como serviço pago/comercial sem autorização expressa prévia por escrito.
+- ⚖️ **Propriedade Intelectual & Copyright:** © 2026 **Hb Head Black**. Todos os direitos reservados.
+
+Para consultar todos os termos jurídicos e condições na íntegra, veja o arquivo [LICENSE](LICENSE).

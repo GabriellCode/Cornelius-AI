@@ -5,6 +5,7 @@ import com.cornelius.config.CorneliusConfig;
 import com.cornelius.storage.DocumentIngester;
 import com.cornelius.storage.ExternalDriveManager;
 import com.cornelius.system.AutostartManager;
+import com.cornelius.system.GitHubSyncEngine;
 import com.cornelius.system.SystemProfile;
 import com.cornelius.util.JsonParser;
 import com.cornelius.util.Logger;
@@ -323,7 +324,9 @@ public class LocalApiServer {
                     }
                     case "lock_pc" -> {
                         if (SystemProfile.isWindows()) {
-                            // Method 1: cmd.exe /c unquoted rundll32
+                            try {
+                                new ProcessBuilder("rundll32.exe", "user32.dll,LockWorkStation").start();
+                            } catch (Exception ignored) {}
                             try {
                                 new ProcessBuilder("cmd.exe", "/c", "rundll32.exe user32.dll,LockWorkStation").start();
                             } catch (Exception e) {
@@ -386,17 +389,13 @@ public class LocalApiServer {
                     case "sync_github" -> {
                         Thread.ofVirtual().start(() -> {
                             try {
-                                if (SystemProfile.isWindows()) {
-                                    new ProcessBuilder("cmd.exe", "/c", "sync-github.bat", "auto-sync via Cornelius mobile app").directory(new File("E:\\APP")).start();
-                                } else {
-                                    new ProcessBuilder("bash", "sync-github.sh").start();
-                                }
+                                GitHubSyncEngine.sync(config, "auto-sync via Cornelius mobile app (100% Java 21)");
                             } catch (Exception e) {
-                                Logger.error("Server", "Erro ao executar sincronização GitHub: " + e.getMessage());
+                                Logger.error("Server", "Erro ao executar sincronização GitHub em Java: " + e.getMessage());
                             }
                         });
                         resp.put("success", true);
-                        resp.put("message", "Sincronização com GitHub iniciada! Seu código será atualizado no repositório.");
+                        resp.put("message", "Sincronização com GitHub iniciada nativamente em Java 21! O repositório está sendo atualizado.");
                     }
                     default -> resp.put("error", "Ação desconhecida: " + action);
                 }

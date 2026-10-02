@@ -1,21 +1,21 @@
 @echo off
 chcp 65001 >nul
-title Sincronizando com GitHub - Cornelius.AI
+title Cornelius.AI - Sincronizacao GitHub (100% Java 21)
 
 echo ===================================================
-echo [CORNELIUS] Sincronizando projeto com o GitHub...
+echo [CORNELIUS] Sincronizacao Nativa em Java 21...
 echo ===================================================
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0sync-github.ps1" %*
+java -Dfile.encoding=UTF-8 -cp "%~dp0cornelius.jar" com.cornelius.system.GitHubSyncEngine %*
 
 if %errorlevel% equ 0 (
     echo.
-    echo [SUCESSO] Repositorio GitHub atualizado!
+    echo [SUCESSO] Repositorio GitHub sincronizado com sucesso via Java 21!
 ) else (
     echo.
-    echo [ERRO] Ocorreu uma falha na sincronizacao. Veja os logs em github_sync.log.
+    echo [ERRO] Ocorreu uma falha. Consulte os logs em github_sync.log.
 )
 
 if "%~1"=="" (
-    timeout /t 4 >nul
+    timeout /t 3 >nul
 )
